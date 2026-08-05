@@ -217,9 +217,10 @@ export default function HomePage() {
       if (!active) return;
       setAuthError(error instanceof Error ? error.message : "No fue posible validar la sesiÃ³n.");
     }).finally(() => { if (active) setAuthReady(true); });
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
       const nextToken = session?.access_token || "";
       setAccessToken(nextToken);
+      if (event === "SIGNED_IN" && session) { setAuthAttempt(current => current + 1); return; }
       if (!session) {
         setProfile(null);
         setAuthError("");
@@ -1051,7 +1052,7 @@ function UserAdministration({ notify, onTechniciansChanged }: { notify: (message
           setLoading(false);
         }
       });
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (!active) return;
       setSessionReady(Boolean(session));
       if (session) {
@@ -1171,5 +1172,6 @@ function UserAdministration({ notify, onTechniciansChanged }: { notify: (message
     </form></div>}
   </section>;
 }
+
 
 
