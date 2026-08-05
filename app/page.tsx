@@ -367,7 +367,7 @@ export default function HomePage() {
   };
 
   const resetQuoteForm = () => {
-    setQuoteClient(clients[0]?.company || clients[0]?.name || "");
+    setQuoteClient(clients[0]?.name || "");
     setQuoteType("Servicio general");
     setQuoteItems([{ id: quoteItemId(), concept: "", quantity: "1", unitPrice: "" }]);
     setQuoteTax(true); setQuoteDiscount(0); setQuoteManualTotal(false); setQuoteTotalInput(""); setEditingQuoteId(null);
@@ -1171,4 +1171,5 @@ function UserAdministration({ notify, onTechniciansChanged }: { notify: (message
     </form></div>}
   </section>;
 }
+
 
