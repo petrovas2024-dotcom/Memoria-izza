@@ -637,7 +637,7 @@ function LoginScreen({ onAuthenticated }: { onAuthenticated: (profile: Profile, 
     if (!email.includes("@")) { setMessage("Escribe primero tu correo electrÃ³nico."); return; }
     if (!supabase) { setMessage("La conexiÃ³n segura no estÃ¡ disponible."); return; }
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
-    setMessage(error ? "No fue posible enviar el correo de recuperaciÃ³n." : "Te enviamos un enlace para restablecer tu contraseÃ±a.");
+    setMessage(error ? error.message : "Te enviamos un enlace para restablecer tu contraseña.");
   };
   return <main className="login-page">
     <section className="login-card">
@@ -1172,6 +1172,7 @@ function UserAdministration({ notify, onTechniciansChanged }: { notify: (message
     </form></div>}
   </section>;
 }
+
 
 
 
