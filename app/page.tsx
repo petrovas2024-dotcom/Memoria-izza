@@ -610,6 +610,21 @@ function LoginScreen({ onAuthenticated }: { onAuthenticated: (profile: Profile, 
   const [message, setMessage] = useState("");
   const [profileFailure, setProfileFailure] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+
+  useEffect(() => {
+    if (!supabase) return;
+
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryMode(true);
+        setMessage("");
+      }
+    });
+
+    return () => data.subscription.unsubscribe();
+  }, []);
   const login = async (event: FormEvent) => {
     event.preventDefault(); setBusy(true); setMessage(""); setProfileFailure(false);
     try {
@@ -639,6 +654,61 @@ function LoginScreen({ onAuthenticated }: { onAuthenticated: (profile: Profile, 
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
     setMessage(error ? error.message : "Te enviamos un enlace para restablecer tu contraseña.");
   };
+  const saveNewPassword = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!supabase) return;
+    if (newPassword.length < 8) {
+      setMessage("La nueva contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
+    setBusy(true);
+    setMessage("");
+
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      setMessage(error.message);
+      setBusy(false);
+      return;
+    }
+
+    await supabase.auth.signOut();
+    setRecoveryMode(false);
+    setNewPassword("");
+    setPassword("");
+    setMessage("Contraseña actualizada. Ya puedes iniciar sesión.");
+    setBusy(false);
+  };
+  if (recoveryMode) {
+    return <main className="login-page">
+      <section className="login-card">
+        <Image src="/logo_izza.png" alt="IZZA Smart" width={94} height={94} priority unoptimized />
+        <p className="eyebrow">IZZA SERVICIOS DE MANTENIMIENTO</p>
+        <h1>Crear nueva contrase&ntilde;a</h1>
+        <p>Escribe una nueva contrase&ntilde;a para tu cuenta.</p>
+        <form onSubmit={saveNewPassword}>
+          <label>
+            Nueva contrase&ntilde;a
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              minLength={8}
+              required
+            />
+          </label>
+          {message && <div className="auth-message">{message}</div>}
+          <button className="primary-button" disabled={busy}>
+            {busy ? "Guardando..." : "Guardar nueva contraseña"}
+          </button>
+        </form>
+      </section>
+    </main>;
+  }
   return <main className="login-page">
     <section className="login-card">
       <Image src="/logo_izza.png" alt="IZZA Smart" width={94} height={94} priority unoptimized />
