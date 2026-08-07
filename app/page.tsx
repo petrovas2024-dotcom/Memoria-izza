@@ -1114,7 +1114,7 @@ function UserAdministration({ notify, onTechniciansChanged }: { notify: (message
       .then(({ data, error: sessionError }) => {
         if (sessionError) throw sessionError;
         if (!data.session) throw new Error("Tu sesión terminó. Cierra sesión e ingresa nuevamente.");
-        if (active) setSessionReady(true);
+        // La sesion se procesa en onAuthStateChange.
       })
       .catch(failure => {
         if (active) {
