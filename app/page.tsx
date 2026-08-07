@@ -1124,6 +1124,11 @@ function UserAdministration({ notify, onTechniciansChanged }: { notify: (message
       });
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (!active) return;
+      if (event === "PASSWORD_RECOVERY") {
+        setSessionReady(false);
+        setError("");
+        return;
+      }
       setSessionReady(Boolean(session));
       if (session) {
         setError("");
