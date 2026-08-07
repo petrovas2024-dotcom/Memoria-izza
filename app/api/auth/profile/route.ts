@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   if (!token) return Response.json({ error: "No autorizado" }, { status: 401 });
   const db = getSupabaseAdmin();
   const { data: auth, error } = await db.auth.getUser(token);
-  if (error || !auth.user) return Response.json({ error: "Sesión inválida" }, { status: 401 });
+  if (error || !auth.user) return Response.json({ error: "SesiÃ³n invÃ¡lida" }, { status: 401 });
 
   let profile = await db.from("users").select("id,full_name,role,active").eq("id", auth.user.id).maybeSingle();
   if (!profile.data && auth.user.email?.toLowerCase() === "petrovas2024@gmail.com") {
