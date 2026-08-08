@@ -616,6 +616,11 @@ function LoginScreen({ onAuthenticated }: { onAuthenticated: (profile: Profile, 
   useEffect(() => {
     if (!supabase) return;
 
+    if (new URLSearchParams(window.location.search).get("recovery") === "1") {
+      setRecoveryMode(true);
+      setMessage("");
+    }
+
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setRecoveryMode(true);
@@ -651,7 +656,7 @@ function LoginScreen({ onAuthenticated }: { onAuthenticated: (profile: Profile, 
   const recover = async () => {
     if (!email.includes("@")) { setMessage("Escribe primero tu correo electrónico."); return; }
     if (!supabase) { setMessage("La conexión segura no está disponible."); return; }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/?recovery=1` });
     setMessage(error ? error.message : "Te enviamos un enlace para restablecer tu contraseña.");
   };
   const saveNewPassword = async (event: FormEvent) => {
